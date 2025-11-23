@@ -101,7 +101,9 @@ Generated Routine for 21 November 2025:
 ```
 # SRO - Scheduler & Copy Tool
 
-![App Screenshot](assets/output.png)
+
+<img width="1324" height="535" alt="output" src="https://github.com/user-attachments/assets/4e582dee-1b0b-434b-b225-7acf9137a9e9" />
+
 Main interface running in VS Code
 
 ---
