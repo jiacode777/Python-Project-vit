@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monthly Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: 'Patrick Hand', cursive;
+      background: #faf9f6;
+      padding: 20px;
+      color: #000;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 280px 1fr 320px;
+      gap: 20px;
+      position: relative;
+    }
+
+    /* Month Box */
+    .month-box {
+      border: 3px solid #000;
+      padding: 15px;
+      background: #fff;
+      position: relative;
+    }
+    .month-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .dots {
+      display: flex;
+      gap: 4px;
+      margin-left: auto;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border: 2px solid #000;
+      border-radius: 50%;
+      background: #fff;
+    }
+    #month-input {
+      width: 100%;
+      padding: 8px;
+      border: 2px solid #000;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .controls select,
+    .controls button {
+      width: 100%;
+      padding: 8px;
+      border: 2px solid #000;
+      background: #fff;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .controls button:hover {
+      background: #f0f0f0;
+    }
+
+    /* Calendar Grid */
+    .calendar-wrapper {
+      position: relative;
+    }
+    .weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .weekday {
+      border: 3px solid #000;
+      padding: 10px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 1px;
+      background: #fff;
+    }
+    .weekday.weekend {
+      background: #000;
+      color: #fff;
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+    .cell {
+      border: 3px solid #000;
+      min-height: 120px;
+      padding: 8px;
+      background: #fff;
+      position: relative;
+    }
+    .cell .date {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+    .cell .items {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .tag {
+      padding: 4px 6px;
+      border: 2px solid #000;
+      border-radius: 4px;
+      font-size: 11px;
+      background: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Cat illustration */
+    .cat {
+      position: absolute;
+      bottom: -60px;
+      right: -40px;
+      width: 140px;
+      height: 140px;
+    }
+    .cat svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Right Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Habit Tracker */
+    .habit-box {
+      border: 3px solid #000;
+      padding: 15px;
+      background: #fff;
+      position: relative;
+    }
+    .habit-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #habit-grid {
+      margin-bottom: 10px;
+      overflow-x: auto;
+    }
+    .h-row {
+      display: grid;
+      grid-template-columns: 80px repeat(31, 20px);
+      gap: 2px;
+      margin-bottom: 2px;
+      font-size: 11px;
+    }
+    .h-name {
+      border: 2px solid #000;
+      padding: 4px;
+      font-size: 11px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .h-cell {
+      border: 2px solid #000;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .h-cell input[type="checkbox"] {
+      width: 12px;
+      height: 12px;
+      cursor: pointer;
+    }
+    .habit-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    #habit-name {
+      flex: 1;
+      padding: 8px;
+      border: 2px solid #000;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 14px;
+    }
+    #habit-add {
+      padding: 8px 16px;
+      border: 2px solid #000;
+      background: #fff;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* Monthly Planner */
+    .planner-box {
+      border: 3px solid #000;
+      padding: 15px;
+      background: #fff;
+      position: relative;
+    }
+    .planner-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #planner-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .planner-item {
+      border: 2px solid #000;
+      padding: 10px;
+      min-height: 100px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+    .planner-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    /* Modal */
+    .data-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: grid;
+      place-items: center;
+      z-index: 1000;
+    }
+    .data-modal.hidden {
+      display: none;
+    }
+    .modal-card {
+      background: #fff;
+      width: 900px;
+      max-width: 95vw;
+      max-height: 90vh;
+      border: 3px solid #000;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .section h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    th, td {
+      border: 2px solid #000;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #f0f0f0;
+      font-weight: 700;
+    }
+    input, select, button {
+      font-family: 'Patrick Hand', cursive;
+      font-size: 14px;
+      padding: 6px;
+      border: 2px solid #000;
+    }
+    button {
+      background: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #f0f0f0;
+    }
+    .small { width: 100px; }
+    .medium { width: 160px; }
+    .wide { width: 220px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Left Sidebar -->
+    <div class="month-box">
+      <div class="month-title">
+        MONTH 月
+        <div class="dots">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      </div>
+      <input type="month" id="month-input" />
+      <div class="controls">
+        <select id="strategy">
+          <option value="edf_priority">EDF Priority</option>
+          <option value="priority_deadline">Priority Deadline</option>
+          <option value="shortest_first">Shortest First</option>
+        </select>
+        <button id="btn-data">Edit Data</button>
+        <button id="btn-generate">Generate Schedule</button>
+        <button id="btn-json">Export JSON</button>
+        <button id="btn-txt">Export TXT</button>
+      </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="calendar-wrapper">
+      <div class="weekdays">
+        <div class="weekday">MON</div>
+        <div class="weekday">TUE</div>
+        <div class="weekday">WED</div>
+        <div class="weekday">THU</div>
+        <div class="weekday">FRI</div>
+        <div class="weekday weekend">SAT</div>
+        <div class="weekday weekend">SUN</div>
+      </div>
+      <div class="calendar-grid" id="calendar-grid"></div>
+      <div class="cat">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Cat silhouette -->
+          <ellipse cx="100" cy="140" rx="45" ry="55" fill="#000"/>
+          <!-- Head -->
+          <circle cx="100" cy="80" r="40" fill="#000"/>
+          <!-- Left ear -->
+          <path d="M 70 60 L 60 30 L 85 55 Z" fill="#000"/>
+          <!-- Right ear -->
+          <path d="M 130 60 L 140 30 L 115 55 Z" fill="#000"/>
+          <!-- Left eye -->
+          <ellipse cx="85" cy="75" rx="12" ry="16" fill="#fff"/>
+          <circle cx="87" cy="78" r="6" fill="#000"/>
+          <!-- Right eye -->
+          <ellipse cx="115" cy="75" rx="12" ry="16" fill="#fff"/>
+          <circle cx="113" cy="78" r="6" fill="#000"/>
+          <!-- Tail -->
+          <path d="M 135 160 Q 160 150 165 130 Q 170 110 160 100" stroke="#000" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <!-- Question mark -->
+          <text x="100" y="40" font-size="36" font-weight="bold" text-anchor="middle" fill="#000">?</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="sidebar">
+      <div class="habit-box">
+        <div class="habit-title">
+          HABIT TRACKER
+          <div class="dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+        </div>
+        <div id="habit-grid"></div>
+        <div class="habit-actions">
+          <input id="habit-name" placeholder="New habit" />
+          <button id="habit-add">Add</button>
+        </div>
+      </div>
+
+      <div class="planner-box">
+        <div class="planner-title">
+          MONTHLY PLANNER
+          <div class="dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+        </div>
+        <div id="planner-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="data-modal hidden" id="data-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>Edit Data</div>
+        <button id="data-close">Close</button>
+      </div>
+      <div class="section">
+        <h3>Tasks</h3>
+        <div id="tasks"></div>
+        <div class="actions">
+          <button onclick="addTaskRow()">Add Task</button>
+          <button onclick="loadSampleTasks()">Load Sample</button>
+        </div>
+      </div>
+      <div class="section">
+        <h3>Time Slots</h3>
+        <div id="slots"></div>
+        <div class="actions">
+          <button onclick="addSlotRow()">Add Slot</button>
+          <button onclick="loadSampleSlots()">Load Sample</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+let tasks = [];
+let slots = [];
+let lastBlocks = [];
+let habits = [];
+let plannerBoxes = 6;
+
+function mondayIndex(d) { return (d === 0) ? 6 : d - 1; }
+
+function renderCalendarGrid(year, month) {
+  const grid = document.getElementById('calendar-grid');
+  grid.innerHTML = '';
+  const first = new Date(year, month, 1);
+  const days = new Date(year, month + 1, 0).getDate();
+  const startOffset = mondayIndex(first.getDay());
+  const cells = 42;
+  for (let i = 0; i < cells; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    const dayNum = i - startOffset + 1;
+    const dateEl = document.createElement('div');
+    dateEl.className = 'date';
+    const items = document.createElement('div');
+    items.className = 'items';
+    if (dayNum >= 1 && dayNum <= days) {
+      dateEl.textContent = String(dayNum).padStart(2, '0');
+      const dateStr = new Date(year, month, dayNum).toISOString().slice(0,10);
+      const blocks = lastBlocks.filter(b => b.date === dateStr);
+      for (const b of blocks) {
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        tag.textContent = `${b.start}-${b.end} ${b.task_name}`;
+        items.appendChild(tag);
+      }
+    } else {
+      dateEl.textContent = '';
+    }
+    cell.appendChild(dateEl);
+    cell.appendChild(items);
+    grid.appendChild(cell);
+  }
+}
+
+function currentYearMonth() {
+  const v = document.getElementById('month-input').value;
+  if (v) { const [y,m] = v.split('-').map(Number); return {year:y, month:m-1}; }
+  const d = new Date();
+  return {year: d.getFullYear(), month: d.getMonth()};
+}
+
+function refreshCalendar() {
+  const {year, month} = currentYearMonth();
+  renderCalendarGrid(year, month);
+  renderHabitGrid(year, month);
+  renderPlannerList();
+}
+
+function renderHabitGrid(year, month) {
+  const root = document.getElementById('habit-grid');
+  root.innerHTML = '';
+  const days = new Date(year, month + 1, 0).getDate();
+  const header = document.createElement('div');
+  header.className = 'h-row';
+  const nameH = document.createElement('div');
+  nameH.className = 'h-name';
+  nameH.textContent = '';
+  header.appendChild(nameH);
+  for (let d=1; d<=days; d++) {
+    const c = document.createElement('div');
+    c.className = 'h-cell';
+    c.textContent = String(d).padStart(2,'0');
+    header.appendChild(c);
+  }
+  root.appendChild(header);
+  habits.forEach((h, idx) => {
+    const row = document.createElement('div');
+    row.className = 'h-row';
+    const name = document.createElement('div');
+    name.className = 'h-name';
+    name.textContent = h.name;
+    row.appendChild(name);
+    if (!h.days) h.days = {};
+    for (let d=1; d<=days; d++) {
+      const c = document.createElement('div');
+      c.className = 'h-cell';
+      const key = String(d);
+      c.innerHTML = `<input type="checkbox" ${h.days[key]? 'checked':''} onchange="toggleHabit(${idx}, ${d}, this.checked)" />`;
+      row.appendChild(c);
+    }
+    root.appendChild(row);
+  });
+}
+
+function toggleHabit(idx, d, checked) {
+  const h = habits[idx];
+  if (!h.days) h.days = {};
+  h.days[String(d)] = checked;
+}
+
+function renderPlannerList() {
+  const root = document.getElementById('planner-list');
+  root.innerHTML = '';
+  for (let i=0;i<plannerBoxes;i++) {
+    const item = document.createElement('div');
+    item.className = 'planner-item';
+    item.innerHTML = `<input type="checkbox" />`;
+    root.appendChild(item);
+  }
+}
+
+function renderTasks() {
+  const root = document.getElementById('tasks');
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  thead.innerHTML = '<tr><th>Name</th><th>Duration (min)</th><th>Deadline</th><th>Priority</th><th></th></tr>';
+  table.appendChild(thead);
+  const tbody = document.createElement('tbody');
+  tasks.forEach((t, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input class="wide" value="${t.name}" onchange="tasks[${idx}].name=this.value" /></td>
+      <td><input class="small" type="number" min="0" value="${t.duration_minutes}" onchange="tasks[${idx}].duration_minutes=parseInt(this.value||'0')" /></td>
+      <td><input class="medium" value="${t.deadline}" onchange="tasks[${idx}].deadline=this.value" /></td>
+      <td>
+        <select onchange="tasks[${idx}].priority=this.value">
+          <option ${t.priority==='low'?'selected':''} value="low">low</option>
+          <option ${t.priority==='medium'?'selected':''} value="medium">medium</option>
+          <option ${t.priority==='high'?'selected':''} value="high">high</option>
+        </select>
+      </td>
+      <td><button onclick="removeTask(${idx})">Remove</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  root.innerHTML = '';
+  root.appendChild(table);
+}
+
+function renderSlots() {
+  const root = document.getElementById('slots');
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  thead.innerHTML = '<tr><th>Date</th><th>Start</th><th>End</th><th></th></tr>';
+  table.appendChild(thead);
+  const tbody = document.createElement('tbody');
+  slots.forEach((s, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input class="medium" value="${s.date}" onchange="slots[${idx}].date=this.value" /></td>
+      <td><input class="small" value="${s.start}" onchange="slots[${idx}].start=this.value" /></td>
+      <td><input class="small" value="${s.end}" onchange="slots[${idx}].end=this.value" /></td>
+      <td><button onclick="removeSlot(${idx})">Remove</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  root.innerHTML = '';
+  root.appendChild(table);
+}
+
+function addTaskRow() { tasks.push({ name: '', duration_minutes: 0, deadline: '', priority: 'low' }); renderTasks(); }
+function removeTask(idx) { tasks.splice(idx, 1); renderTasks(); }
+function addSlotRow() { slots.push({ date: '', start: '09:00', end: '10:00' }); renderSlots(); }
+function removeSlot(idx) { slots.splice(idx, 1); renderSlots(); }
+
+function loadSampleTasks() {
+  tasks = [
+    { name: 'Math Study', duration_minutes: 180, deadline: '2025-11-25', priority: 'high' },
+    { name: 'Gym', duration_minutes: 60, deadline: '2025-11-23', priority: 'medium' },
+    { name: 'Essay Draft', duration_minutes: 240, deadline: '2025-11-27', priority: 'high' },
+    { name: 'Laundry', duration_minutes: 45, deadline: '2025-11-22', priority: 'low' }
+  ];
+  renderTasks();
+}
+
+function loadSampleSlots() {
+  slots = [
+    { date: '2025-11-22', start: '09:00', end: '12:00' },
+    { date: '2025-11-22', start: '14:00', end: '16:00' },
+    { date: '2025-11-23', start: '10:00', end: '13:00' }
+  ];
+  renderSlots();
+}
+
+function submitSchedule() {
+  if (tasks.length === 0) {
+    alert('Please add tasks first (click "Edit Data")');
+    return;
+  }
+  if (slots.length === 0) {
+    alert('Please add time slots first (click "Edit Data")');
+    return;
+  }
+  const strategy = document.getElementById('strategy').value;
+  const payload = { tasks, time_slots: slots, strategy };
+  fetch('/api/schedule', { 
+    method: 'POST', 
+    headers: { 'Content-Type': 'application/json' }, 
+    body: JSON.stringify(payload) 
+  })
+    .then(r => {
+      if (!r.ok) throw new Error('Server error');
+      return r.json();
+    })
+    .then(data => { 
+      lastBlocks = data.blocks || [];
+      if (data.unscheduled && data.unscheduled.length > 0) {
+        console.log('Unscheduled tasks:', data.unscheduled);
+        alert(`Schedule generated! ${data.unscheduled.length} task(s) could not be scheduled.`);
+      }
+      refreshCalendar(); 
+    })
+    .catch(err => { 
+      alert('Error generating schedule. Make sure the server is running on port 8000.'); 
+      console.error(err); 
+    });
+}
+
+function buildJsonPayload(blocks) { return JSON.stringify(blocks, null, 2); }
+function buildTxtPayload(blocks) {
+  const sorted = blocks.slice().sort((a, b) => { if (a.date !== b.date) return a.date.localeCompare(b.date); return a.start.localeCompare(b.start); });
+  const lines = ['Schedule'];
+  for (const b of sorted) lines.push(`${b.date} ${b.start}-${b.end} | ${b.task_name} | ${b.minutes} min`);
+  return lines.join('\n');
+}
+
+function download(filename, content, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+function downloadJSON() { if (!lastBlocks || lastBlocks.length === 0) { alert('Generate schedule first'); return; } const content = buildJsonPayload(lastBlocks); download('schedule.json', content, 'application/json'); }
+function downloadTXT() { if (!lastBlocks || lastBlocks.length === 0) { alert('Generate schedule first'); return; } const content = buildTxtPayload(lastBlocks); download('schedule.txt', content, 'text/plain'); }
+
+function addHabit(name) { if (!name) return; habits.push({ name, days: {} }); refreshCalendar(); }
+
+document.getElementById('btn-data').addEventListener('click', () => { document.getElementById('data-modal').classList.remove('hidden'); });
+document.getElementById('data-close').addEventListener('click', () => { document.getElementById('data-modal').classList.add('hidden'); refreshCalendar(); });
+document.getElementById('btn-generate').addEventListener('click', submitSchedule);
+document.getElementById('btn-json').addEventListener('click', () => downloadJSON());
+document.getElementById('btn-txt').addEventListener('click', () => downloadTXT());
+document.getElementById('habit-add').addEventListener('click', () => { const n = document.getElementById('habit-name').value.trim(); document.getElementById('habit-name').value=''; addHabit(n); });
+document.getElementById('month-input').addEventListener('change', refreshCalendar);
+
+tasks = []; slots = []; habits = [];
+renderTasks(); renderSlots();
+const now = new Date(); document.getElementById('month-input').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+refreshCalendar();
+  </script>
+</body>
+</html>
