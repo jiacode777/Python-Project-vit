@@ -133,5 +133,5 @@ Developed by Naivedya Singh 25BAI10770
 
 ## 11. License
 
-This project is open for educational and personal use.
+This project is mine Naivedya Singh and cannot be used 
 
